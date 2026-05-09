@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedVision AI — Классификация рентген-снимков</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="app">
+        <!-- Боковое меню -->
+        <aside class="sidebar">
+            <div class="logo">MedVision AI</div>
+            <nav class="nav">
+                <a href="#" class="nav-item active" data-screen="dashboard">
+                    <span class="icon">📊</span> Главная
+                </a>
+                <a href="#" class="nav-item" data-screen="upload">
+                    <span class="icon">📁</span> Загрузка
+                </a>
+                <a href="#" class="nav-item" data-screen="history">
+                    <span class="icon">📋</span> История
+                </a>
+                <a href="#" class="nav-item" data-screen="settings">
+                    <span class="icon">⚙</span> Настройки
+                </a>
+                <a href="#" class="nav-item" data-screen="help">
+                    <span class="icon">❓</span> Помощь
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Основной контент -->
+        <main class="main">
+            <!-- Шапка -->
+            <header class="header">
+                <h1 id="page-title">Главная панель</h1>
+                <div class="user-menu">
+                    <span>Иванов И.И.</span>
+                    <button class="btn-logout">Выйти</button>
+                </div>
+            </header>
+
+            <!-- Экраны -->
+            <div class="content">
+                
+                <!-- ЭКРАН 1: ГЛАВНАЯ -->
+                <div class="screen active" id="screen-dashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card green">
+                            <div class="stat-label">Всего анализов</div>
+                            <div class="stat-value">1 247</div>
+                        </div>
+                        <div class="stat-card blue">
+                            <div class="stat-label">Точность модели</div>
+                            <div class="stat-value">94.2%</div>
+                        </div>
+                        <div class="stat-card orange">
+                            <div class="stat-label">Обработано сегодня</div>
+                            <div class="stat-value">23</div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">
+                            <h2>Последние анализы</h2>
+                            <button class="btn btn-primary" onclick="showScreen('upload')">+ Новый анализ</button>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Дата</th>
+                                    <th>Изображение</th>
+                                    <th>Диагноз</th>
+                                    <th>Уверенность</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>26.04.2026</td>
+                                    <td>chest_001.jpg</td>
+                                    <td><span class="badge red">Пневмония</span></td>
+                                    <td>96.4%</td>
+                                </tr>
+                                <tr>
+                                    <td>25.04.2026</td>
+                                    <td>chest_045.jpg</td>
+                                    <td><span class="badge green">Норма</span></td>
+                                    <td>91.2%</td>
+                                </tr>
+                                <tr>
+                                    <td>25.04.2026</td>
+                                    <td>chest_112.jpg</td>
+                                    <td><span class="badge red">Пневмония</span></td>
+                                    <td>88.7%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ЭКРАН 2: ЗАГРУЗКА -->
+                <div class="screen" id="screen-upload">
+                    <div class="upload-zone" id="upload-zone">
+                        <div class="upload-icon">📤</div>
+                        <div class="upload-text">Перетащите сюда изображение</div>
+                        <div class="upload-subtext">или нажмите для выбора файла</div>
+                        <div class="upload-formats">Поддерживаемые форматы: PNG, JPEG, DICOM</div>
+                        <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.dcm" hidden>
+                    </div>
+
+                    <div class="file-info" id="file-info" style="display: none;" data-image-id="">
+                        <h3>Выбранный файл:</h3>
+                        <div class="file-name" id="file-name">—</div>
+                        <div class="file-meta" id="file-meta">—</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                            <span class="progress-text" id="progress-text">Загрузка... 0%</span>
+                        </div>
+                    </div>
+
+                    <div class="actions" id="upload-actions" style="display: none;">
+                        <button class="btn btn-primary" onclick="analyze()">Анализировать</button>
+                        <button class="btn btn-secondary" onclick="resetUpload()">Отмена</button>
+                    </div>
+                </div>
+
+                <!-- ЭКРАН 3: РЕЗУЛЬТАТЫ -->
+                <div class="screen" id="screen-results">
+                    <div class="results-grid">
+                        <!-- Исходное изображение -->
+                        <div class="image-preview">
+                            <div class="preview-label">Исходное изображение</div>
+                            <div class="preview-box">
+                                <img id="original-img" src="" alt="Исходное изображение" style="max-width: 100%; max-height: 100%; display: none;">
+                                <div class="placeholder-img" id="original-placeholder">🖼</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Grad-CAM -->
+                        <div class="image-preview">
+                            <div class="preview-label">Grad-CAM Heatmap</div>
+                            <div class="preview-box heatmap">
+                                <img id="heatmap-img" src="" alt="Grad-CAM" style="max-width: 100%; max-height: 100%; display: none;">
+                                <div class="placeholder-img" id="heatmap-placeholder">🔥</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Панель результатов -->
+                    <div class="results-panel" id="results-panel" data-prediction-id="">
+                        <h3>Результаты классификации</h3>
+                        
+                        <!-- Диагноз -->
+                        <div class="diagnosis-badge" id="diagnosis-badge">
+                            Диагноз: <span id="result-class">—</span>
+                        </div>
+                        
+                        <p>Уверенность модели: <span id="result-confidence">—</span></p>
+                        
+                        <!-- Вероятности по классам (заполняется JS) -->
+                        <div id="probabilities-list">
+                            <!-- Сюда JS вставит progress bars -->
+                        </div>
+                    </div>
+
+                    <!-- Кнопки действий -->
+                    <div class="diagnosis-row">
+                        <button class="btn btn-blue" onclick="exportPDF()">💾 Экспорт PDF</button>
+                        <button class="btn btn-secondary" onclick="showScreen('upload')">← Новый анализ</button>
+                    </div>
+                </div>
+
+                <!-- ЭКРАН 4: ИСТОРИЯ -->
+                <div class="screen" id="screen-history">
+                    <div class="section-header">
+                        <h2>История анализов</h2>
+                        <input type="text" class="search-input" placeholder="Поиск по дате...">
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Дата</th>
+                                <th>Файл</th>
+                                <th>Диагноз</th>
+                                <th>Уверенность</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>001</td>
+                                <td>26.04.26</td>
+                                <td>chest_001.png</td>
+                                <td><span class="badge red">Пневмония</span></td>
+                                <td>96.4%</td>
+                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
+                            </tr>
+                            <tr>
+                                <td>002</td>
+                                <td>25.04.26</td>
+                                <td>chest_045.png</td>
+                                <td><span class="badge green">Норма</span></td>
+                                <td>91.2%</td>
+                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
+                            </tr>
+                            <tr>
+                                <td>003</td>
+                                <td>25.04.26</td>
+                                <td>chest_112.png</td>
+                                <td><span class="badge red">Пневмония</span></td>
+                                <td>88.7%</td>
+                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
+                            </tr>
+                            <tr>
+                                <td>004</td>
+                                <td>24.04.26</td>
+                                <td>chest_089.png</td>
+                                <td><span class="badge green">Норма</span></td>
+                                <td>95.1%</td>
+                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
+                            </tr>
+                            <tr>
+                                <td>005</td>
+                                <td>23.04.26</td>
+                                <td>chest_203.png</td>
+                                <td><span class="badge orange">Другая</span></td>
+                                <td>82.3%</td>
+                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <a href="#">&lt;</a>
+                        <a href="#" class="active">1</a>
+                        <a href="#">2</a>
+                        <a href="#">3</a>
+                        <span>...</span>
+                        <a href="#">12</a>
+                        <a href="#">&gt;</a>
+                    </div>
+                </div>
+
+                <!-- ЭКРАН 5: НАСТРОЙКИ -->
+                <div class="screen" id="screen-settings">
+                    <div class="settings-section">
+                        <h3>Модель классификации</h3>
+                        <div class="setting-row">
+                            <label>Архитектура:</label>
+                            <select><option>DenseNet-121</option><option>ResNet-50</option><option>EfficientNet-B0</option></select>
+                        </div>
+                        <div class="setting-row">
+                            <label>Порог уверенности:</label>
+                            <input type="text" value="85%">
+                        </div>
+                        <div class="setting-row">
+                            <label>Размер входа:</label>
+                            <input type="text" value="224×224">
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Предобработка</h3>
+                        <div class="setting-row">
+                            <label>Нормализация:</label>
+                            <input type="text" value="ImageNet stats">
+                        </div>
+                        <div class="setting-row">
+                            <label>Аугментация:</label>
+                            <select><option>Включена</option><option>Отключена</option></select>
+                        </div>
+                        <div class="setting-row">
+                            <label>Формат вывода:</label>
+                            <select><option>PNG + JSON</option><option>PDF</option><option>DICOM SR</option></select>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Интерпретация</h3>
+                        <div class="setting-row">
+                            <label>Метод:</label>
+                            <select><option>Grad-CAM</option><option>Grad-CAM++</option><option>LayerCAM</option></select>
+                        </div>
+                        <div class="setting-row">
+                            <label>Прозрачность:</label>
+                            <input type="text" value="70%">
+                        </div>
+                        <div class="setting-row">
+                            <label>Цветовая схема:</label>
+                            <select><option>Jet</option><option>Hot</option><option>Viridis</option></select>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-primary">💾 Сохранить</button>
+                        <button class="btn btn-secondary">↺ По умолчанию</button>
+                    </div>
+                </div>
+
+                <!-- ЭКРАН 6: ПОМОЩЬ -->
+                <div class="screen" id="screen-help">
+                    <div class="help-content">
+                        <h2>Руководство пользователя</h2>
+                        <div class="help-section">
+                            <h3>Как загрузить изображение?</h3>
+                            <p>Перейдите в раздел «Загрузка», перетащите файл в зону загрузки или нажмите на неё для выбора файла. Поддерживаются форматы PNG, JPEG и DICOM.</p>
+                        </div>
+                        <div class="help-section">
+                            <h3>Как интерпретировать результаты?</h3>
+                            <p>После анализа вы увидите исходное изображение и Grad-CAM heatmap. Цветные области на heatmap показывают, на какие участки снимка модель обратила внимание при принятии решения.</p>
+                        </div>
+                        <div class="help-section">
+                            <h3>Как экспортировать отчёт?</h3>
+                            <p>На экране результатов нажмите кнопку «Экспорт PDF». Отчёт будет сохранён в формате PDF и содержит изображение, heatmap и вероятности по всем классам.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
