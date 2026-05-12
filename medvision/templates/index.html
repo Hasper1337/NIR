@@ -7,6 +7,38 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div class="auth-screen" id="auth-screen" style="display: none;">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">MedVision AI</div>
+                <div class="auth-subtitle">Войдите или зарегистрируйтесь</div>
+            </div>
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tab-login" onclick="showAuthTab('login')">Вход</button>
+                <button class="auth-tab" id="tab-register" onclick="showAuthTab('register')">Регистрация</button>
+            </div>
+            <div class="auth-body">
+                <form id="login-form" class="auth-form">
+                    <label>Логин</label>
+                    <input type="text" id="login-username" placeholder="Введите логин" required>
+                    <label>Пароль</label>
+                    <input type="password" id="login-password" placeholder="Введите пароль" required>
+                    <button type="submit" class="btn btn-primary">Войти</button>
+                    <div class="auth-hint">Демо: demo / demo</div>
+                </form>
+                <form id="register-form" class="auth-form" style="display: none;">
+                    <label>Логин</label>
+                    <input type="text" id="register-username" placeholder="Придумайте логин" required>
+                    <label>Email</label>
+                    <input type="email" id="register-email" placeholder="example@mail.com" required>
+                    <label>Пароль</label>
+                    <input type="password" id="register-password" placeholder="Придумайте пароль" required>
+                    <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
+                </form>
+            </div>
+            <div class="auth-error" id="auth-error"></div>
+        </div>
+    </div>
     <div class="app">
         <!-- Боковое меню -->
         <aside class="sidebar">
@@ -36,8 +68,8 @@
             <header class="header">
                 <h1 id="page-title">Главная панель</h1>
                 <div class="user-menu">
-                    <span>Иванов И.И.</span>
-                    <button class="btn-logout">Выйти</button>
+                    <span id="user-name">Гость</span>
+                    <button class="btn-logout" id="btn-logout">Выйти</button>
                 </div>
             </header>
 
@@ -49,15 +81,15 @@
                     <div class="stats-grid">
                         <div class="stat-card green">
                             <div class="stat-label">Всего анализов</div>
-                            <div class="stat-value">1 247</div>
+                            <div class="stat-value" id="stat-total">—</div>
                         </div>
                         <div class="stat-card blue">
                             <div class="stat-label">Точность модели</div>
-                            <div class="stat-value">94.2%</div>
+                            <div class="stat-value" id="stat-accuracy">—</div>
                         </div>
                         <div class="stat-card orange">
                             <div class="stat-label">Обработано сегодня</div>
-                            <div class="stat-value">23</div>
+                            <div class="stat-value" id="stat-today">—</div>
                         </div>
                     </div>
 
@@ -75,26 +107,7 @@
                                     <th>Уверенность</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>26.04.2026</td>
-                                    <td>chest_001.jpg</td>
-                                    <td><span class="badge red">Пневмония</span></td>
-                                    <td>96.4%</td>
-                                </tr>
-                                <tr>
-                                    <td>25.04.2026</td>
-                                    <td>chest_045.jpg</td>
-                                    <td><span class="badge green">Норма</span></td>
-                                    <td>91.2%</td>
-                                </tr>
-                                <tr>
-                                    <td>25.04.2026</td>
-                                    <td>chest_112.jpg</td>
-                                    <td><span class="badge red">Пневмония</span></td>
-                                    <td>88.7%</td>
-                                </tr>
-                            </tbody>
+                            <tbody id="recent-body"></tbody>
                         </table>
                     </div>
                 </div>
@@ -175,7 +188,7 @@
                 <div class="screen" id="screen-history">
                     <div class="section-header">
                         <h2>История анализов</h2>
-                        <input type="text" class="search-input" placeholder="Поиск по дате...">
+                        <input type="text" class="search-input" id="history-search" placeholder="Поиск по дате или имени...">
                     </div>
                     <table class="data-table">
                         <thead>
@@ -188,48 +201,7 @@
                                 <th>Действия</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>001</td>
-                                <td>26.04.26</td>
-                                <td>chest_001.png</td>
-                                <td><span class="badge red">Пневмония</span></td>
-                                <td>96.4%</td>
-                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
-                            </tr>
-                            <tr>
-                                <td>002</td>
-                                <td>25.04.26</td>
-                                <td>chest_045.png</td>
-                                <td><span class="badge green">Норма</span></td>
-                                <td>91.2%</td>
-                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
-                            </tr>
-                            <tr>
-                                <td>003</td>
-                                <td>25.04.26</td>
-                                <td>chest_112.png</td>
-                                <td><span class="badge red">Пневмония</span></td>
-                                <td>88.7%</td>
-                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
-                            </tr>
-                            <tr>
-                                <td>004</td>
-                                <td>24.04.26</td>
-                                <td>chest_089.png</td>
-                                <td><span class="badge green">Норма</span></td>
-                                <td>95.1%</td>
-                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
-                            </tr>
-                            <tr>
-                                <td>005</td>
-                                <td>23.04.26</td>
-                                <td>chest_203.png</td>
-                                <td><span class="badge orange">Другая</span></td>
-                                <td>82.3%</td>
-                                <td><button class="btn-icon" onclick="showScreen('results')">👁</button> <button class="btn-icon">💾</button></td>
-                            </tr>
-                        </tbody>
+                        <tbody id="history-body"></tbody>
                     </table>
                     <div class="pagination">
                         <a href="#">&lt;</a>
@@ -248,15 +220,19 @@
                         <h3>Модель классификации</h3>
                         <div class="setting-row">
                             <label>Архитектура:</label>
-                            <select><option>DenseNet-121</option><option>ResNet-50</option><option>EfficientNet-B0</option></select>
+                            <select id="model-name">
+                                <option value="densenet121">DenseNet-121</option>
+                                <option value="resnet50">ResNet-50</option>
+                                <option value="efficientnet_b0">EfficientNet-B0</option>
+                            </select>
                         </div>
                         <div class="setting-row">
                             <label>Порог уверенности:</label>
-                            <input type="text" value="85%">
+                            <input type="text" id="threshold" value="0.85">
                         </div>
                         <div class="setting-row">
                             <label>Размер входа:</label>
-                            <input type="text" value="224×224">
+                            <input type="text" id="input-size" value="224">
                         </div>
                     </div>
 
@@ -293,8 +269,8 @@
                     </div>
 
                     <div class="actions">
-                        <button class="btn btn-primary">💾 Сохранить</button>
-                        <button class="btn btn-secondary">↺ По умолчанию</button>
+                        <button class="btn btn-primary" onclick="saveSettings()">💾 Сохранить</button>
+                        <button class="btn btn-secondary" onclick="resetSettings()">↺ По умолчанию</button>
                     </div>
                 </div>
 

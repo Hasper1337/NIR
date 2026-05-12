@@ -32,8 +32,8 @@ function showScreen(screenName) {
         'dashboard': 'Главная панель',
         'upload': 'Загрузка изображения',
         'history': 'История анализов',
-        'settings': 'Настройки модели',
-        'help': 'Помощь',
+        'settings': 'Параметры системы',
+        'help': 'Справка и поддержка',
         'results': 'Результаты анализа'
     };
     document.getElementById('page-title').textContent = titles[screenName] || '';
@@ -71,7 +71,7 @@ fileInput.addEventListener('change', (e) => {
 
 function handleFile(file) {
     document.getElementById('file-name').textContent = file.name;
-    document.getElementById('file-meta').textContent = `Размер: ${(file.size / 1024 / 1024).toFixed(1)} MB | Тип: ${file.type || 'DICOM'}`;
+    document.getElementById('file-meta').textContent = `${(file.size / 1024 / 1024).toFixed(1)} MB • ${file.type || 'DICOM'}`;
     document.getElementById('file-info').style.display = 'block';
     document.getElementById('upload-actions').style.display = 'flex';
     
@@ -85,7 +85,7 @@ function handleFile(file) {
         if (progress >= 100) {
             progress = 100;
             clearInterval(interval);
-            text.textContent = 'Готово к анализу';
+            text.textContent = 'Готово к анализу ✓';
         } else {
             text.textContent = `Загрузка... ${Math.round(progress)}%`;
         }
@@ -97,6 +97,7 @@ function resetUpload() {
     document.getElementById('file-info').style.display = 'none';
     document.getElementById('upload-actions').style.display = 'none';
     document.getElementById('progress-fill').style.width = '0%';
+    document.getElementById('progress-text').textContent = 'Загрузка... 0%';
     fileInput.value = '';
 }
 
@@ -104,4 +105,5 @@ function analyze() {
     // Переход к результатам
     showScreen('results');
     document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+    document.querySelector('[data-screen="dashboard"]').classList.add('active');
 }

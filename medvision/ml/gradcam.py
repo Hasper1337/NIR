@@ -106,7 +106,7 @@ class GradCAM:
 
 def save_gradcam(image_tensor, save_path, target_class=None, model=None):
     if model is None:
-        from classifier import get_classifier
+        from ml.classifier import get_classifier
         model = get_classifier().model
     
     gradcam = GradCAM(model)
@@ -117,8 +117,8 @@ def save_gradcam(image_tensor, save_path, target_class=None, model=None):
 
 
 if __name__ == '__main__':
-    from classifier import get_classifier
-    from preprocess import preprocess_image
+    from ml.classifier import get_classifier
+    from ml.preprocess import preprocess_image
     from PIL import Image
     import numpy as np
     

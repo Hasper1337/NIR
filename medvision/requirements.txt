@@ -7,3 +7,5 @@ numpy==1.26.4
 opencv-python==4.9.0.80
 matplotlib==3.8.4
 Werkzeug==3.0.3
+pydicom==2.4.4
+reportlab==4.2.2

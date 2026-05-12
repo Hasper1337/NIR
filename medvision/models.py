@@ -11,12 +11,13 @@ from datetime import datetime
 db = SQLAlchemy()
 
 class User(db.Model):
-    """Таблица пользователей. Пока упрощённая — без паролей для демо."""
+    """Таблица пользователей."""
     __tablename__ = 'users'
     
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True)
+    password_hash = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Связь 1:N — один пользователь может загрузить много изображений
