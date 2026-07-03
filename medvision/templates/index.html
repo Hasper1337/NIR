@@ -41,23 +41,24 @@
     </div>
     <div class="app">
         <!-- Боковое меню -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">MedVision AI</div>
+            <button class="menu-toggle" id="menu-toggle">☰</button>
             <nav class="nav">
                 <a href="#" class="nav-item active" data-screen="dashboard">
-                    <span class="icon">📊</span> Главная
+                    <span class="icon">🌐</span> <span class="nav-label">Главная</span>
                 </a>
                 <a href="#" class="nav-item" data-screen="upload">
-                    <span class="icon">📁</span> Загрузка
+                    <span class="icon">⬇️</span> <span class="nav-label">Загрузка</span>
                 </a>
                 <a href="#" class="nav-item" data-screen="history">
-                    <span class="icon">📋</span> История
+                    <span class="icon">📋</span> <span class="nav-label">История</span>
                 </a>
                 <a href="#" class="nav-item" data-screen="settings">
-                    <span class="icon">⚙</span> Настройки
+                    <span class="icon">⚙</span> <span class="nav-label">Настройки</span>
                 </a>
                 <a href="#" class="nav-item" data-screen="help">
-                    <span class="icon">❓</span> Помощь
+                    <span class="icon">❔</span> <span class="nav-label">Помощь</span>
                 </a>
             </nav>
         </aside>
@@ -219,7 +220,10 @@
                     <div class="settings-section">
                         <h3>Модель классификации</h3>
                         <div class="setting-row">
-                            <label>Архитектура:</label>
+                            <div class="setting-label-group">
+                                <label>Архитектура:</label>
+                                <span class="tooltip-icon tooltip-wide" title="Выберите архитектуру нейронной сети. DenseNet-121 - быстрая и точная, ResNet-50 - классическая и надёжная, EfficientNet-B0 - оптимальна по памяти и скорости">?</span>
+                            </div>
                             <select id="model-name">
                                 <option value="densenet121">DenseNet-121</option>
                                 <option value="resnet50">ResNet-50</option>
@@ -227,11 +231,17 @@
                             </select>
                         </div>
                         <div class="setting-row">
-                            <label>Порог уверенности:</label>
+                            <div class="setting-label-group">
+                                <label>Порог уверенности:</label>
+                                <span class="tooltip-icon" title="Минимальная уверенность модели для вывода диагноза. Более высокие значения уменьшают ложные срабатывания, но могут упустить реальные случаи">?</span>
+                            </div>
                             <input type="text" id="threshold" value="0.85">
                         </div>
                         <div class="setting-row">
-                            <label>Размер входа:</label>
+                            <div class="setting-label-group">
+                                <label>Размер входа:</label>
+                                <span class="tooltip-icon" title="Размер изображения на входе модели в пикселях. Стандартное значение 224x224. Большие значения требуют больше памяти, но могут улучшить точность">?</span>
+                            </div>
                             <input type="text" id="input-size" value="224">
                         </div>
                     </div>
@@ -239,15 +249,24 @@
                     <div class="settings-section">
                         <h3>Предобработка</h3>
                         <div class="setting-row">
-                            <label>Нормализация:</label>
-                            <input type="text" value="ImageNet stats">
+                            <div class="setting-label-group">
+                                <label>Нормализация:</label>
+                                <span class="tooltip-icon" title="Метод нормализации пикселей изображения. ImageNet stats используют среднее и стандартное отклонение из набора ImageNet для согласованности с другими моделями">?</span>
+                            </div>
+                            <input type="text" value="ImageNet stats" readonly>
                         </div>
                         <div class="setting-row">
-                            <label>Аугментация:</label>
+                            <div class="setting-label-group">
+                                <label>Аугментация:</label>
+                                <span class="tooltip-icon" title="Включение аугментации данных помогает улучшить обобщение модели на новых изображениях, но замедляет обработку">?</span>
+                            </div>
                             <select><option>Включена</option><option>Отключена</option></select>
                         </div>
                         <div class="setting-row">
-                            <label>Формат вывода:</label>
+                            <div class="setting-label-group">
+                                <label>Формат вывода:</label>
+                                <span class="tooltip-icon" title="Формат для сохранения результатов. PNG + JSON - стандартный, PDF - для печати и документов, DICOM SR - для интеграции с медицинскими системами">?</span>
+                            </div>
                             <select><option>PNG + JSON</option><option>PDF</option><option>DICOM SR</option></select>
                         </div>
                     </div>
@@ -255,15 +274,24 @@
                     <div class="settings-section">
                         <h3>Интерпретация</h3>
                         <div class="setting-row">
-                            <label>Метод:</label>
+                            <div class="setting-label-group">
+                                <label>Метод:</label>
+                                <span class="tooltip-icon" title="Метод визуализации решения модели. Grad-CAM - классический метод, Grad-CAM++ - улучшенный, LayerCAM - более точный но медленнее">?</span>
+                            </div>
                             <select><option>Grad-CAM</option><option>Grad-CAM++</option><option>LayerCAM</option></select>
                         </div>
                         <div class="setting-row">
-                            <label>Прозрачность:</label>
+                            <div class="setting-label-group">
+                                <label>Прозрачность:</label>
+                                <span class="tooltip-icon" title="Уровень прозрачности тепловой карты (heatmap) при наложении на исходное изображение. Увеличьте для лучшей видимости исходного снимка">?</span>
+                            </div>
                             <input type="text" value="70%">
                         </div>
                         <div class="setting-row">
-                            <label>Цветовая схема:</label>
+                            <div class="setting-label-group">
+                                <label>Цветовая схема:</label>
+                                <span class="tooltip-icon" title="Цветовая палитра для визуализации. Jet - стандартная, Hot - от чёрного к красному, Viridis - монотонная и доступная для дальтоников">?</span>
+                            </div>
                             <select><option>Jet</option><option>Hot</option><option>Viridis</option></select>
                         </div>
                     </div>

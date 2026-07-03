@@ -1,3 +1,72 @@
+// ===== МОБИЛЬНОЕ МЕНЮ =====
+function initMobileMenu() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const nav = document.querySelector('.nav');
+    const navItems = document.querySelectorAll('.nav-item');
+    const sidebar = document.getElementById('sidebar');
+
+    if (!menuToggle || !nav) return;
+
+    // Переключение меню
+    menuToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        nav.classList.toggle('open');
+        sidebar.classList.toggle('open');
+    });
+
+    // Закрытие меню при клике на пункт
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            nav.classList.remove('open');
+            sidebar.classList.remove('open');
+        });
+    });
+
+    // Закрытие меню при клике вне его
+    document.addEventListener('click', () => {
+        if (nav.classList.contains('open')) {
+            nav.classList.remove('open');
+            sidebar.classList.remove('open');
+        }
+    });
+
+    nav.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
+// ===== TOOLTIP ФУНКЦИОНАЛЬНОСТЬ =====
+function initTooltips() {
+    const tooltips = document.querySelectorAll('.tooltip-icon');
+    
+    tooltips.forEach(tooltip => {
+        // Для мобильных устройств добавляем click/tap поддержку
+        if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+            tooltip.addEventListener('click', (e) => {
+                e.stopPropagation();
+                tooltip.classList.toggle('active');
+                // Закрыть другие tooltips
+                document.querySelectorAll('.tooltip-icon.active').forEach(t => {
+                    if (t !== tooltip) t.classList.remove('active');
+                });
+            });
+        }
+    });
+    
+    // Закрыть tooltip при клике вне
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.tooltip-icon.active').forEach(t => {
+            t.classList.remove('active');
+        });
+    });
+}
+
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    initMobileMenu();
+    initTooltips();
+});
+
 // ===== НАВИГАЦИЯ =====
 document.querySelectorAll('.nav-item').forEach(item => {
     item.addEventListener('click', (e) => {
@@ -377,10 +446,10 @@ function renderRecent(items) {
 
         body.innerHTML += `
             <tr>
-                <td>${date}</td>
-                <td>${item.filename || '—'}</td>
-                <td><span class="badge ${badgeClass}">${diag}</span></td>
-                <td>${conf}</td>
+                <td data-label="Дата:">${date}</td>
+                <td data-label="Изображение:">${item.filename || '—'}</td>
+                <td data-label="Диагноз:"><span class="badge ${badgeClass}">${diag}</span></td>
+                <td data-label="Уверенность:">${conf}</td>
             </tr>
         `;
     }
@@ -443,12 +512,12 @@ function renderHistory(items) {
 
         body.innerHTML += `
             <tr>
-                <td>${item.image_id}</td>
-                <td>${date}</td>
-                <td>${item.filename || '—'}</td>
-                <td><span class="badge ${badgeClass}">${diag}</span></td>
-                <td>${conf}</td>
-                <td>
+                <td data-label="ID:">${item.image_id}</td>
+                <td data-label="Дата:">${date}</td>
+                <td data-label="Файл:">${item.filename || '—'}</td>
+                <td data-label="Диагноз:"><span class="badge ${badgeClass}">${diag}</span></td>
+                <td data-label="Уверенность:">${conf}</td>
+                <td data-label="Действия:">
                     <button class="btn-icon" onclick="viewResult(${predictionId || 'null'})">👁</button>
                     <button class="btn-icon" onclick="exportPDF(${predictionId || 'null'})">💾</button>
                 </td>
